@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Courses</title>
+	<link rel="stylesheet"
+	 href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+	<!-- container container-fluid  -->
+    <div id="item">
+	<div class="container">
+		<div class="row">
+			<div class="offset-3 col-6">
+					<h1> Liste de courses</h1>
+						<br>
+						<div class="row">
+							<div class="col-6">
+								<input id="item" v-model="name" class="form-control" >
+							</div>
+							<div class="col-2">
+								<button @click="ajouter()" id="btn1" class="btn btn-success">
+									<i class="fa fa-plus"></i>
+								</button>
+							</div>
+						</div>
+				<br>
+					<table  class="table table-striped">
+						<thead>
+							<th>Item</th>
+							<th>Action</th>
+						</thead>
+						<tbody id="tab1">
+                            <tr v-for="(p, index) in tableau">
+                                <td>{{ p.title }}</td>
+                                <td>
+                                    <button @click="valider(index)" class="btn btn-primary acheter">
+                                        <i class="fa fa-check"></i>
+                                    </button>
+                                  <button 
+                                  @click="enlever(index)"
+                                  class="btn btn-danger">
+                                    <i class="fa fa-trash"></i>
+                                  </button>
+                                </td>
+                            </tr> 
+
+						</tbody>
+					</table>
+			</div>
+		
+		</div>
+	</div>
+</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script>
+        const app = new Vue(
+        {
+            el :'#item',
+            data :
+            {
+                tableau:[],
+                name: '',
+            },
+            methods:
+            {
+                ajouter()
+                {
+                    let i ={}; 
+                    i.title = this.name;
+                    this.title= '';
+                     // on ajoute ds le tableau
+                    let url = '../back_end/public/items/';
+                    let param ={};
+                    param.method = 'POST';
+                    param.header = {'content-Type':'application/json'};
+                    param.body = JSON.stringify(i); 
+                    fetch(url,param)
+                    .then( response => response.json() )
+                    .then(
+                    info =>{ 
+                        console.log(info);
+                        i.id = info.id;
+                        this.tableau.push(i);
+                
+                    })
+                },
+                enlever(i)
+                {
+               
+                // console.log(this.tableau);
+                let id = this.tableau[i].id;
+                this.tableau.splice(i,1);
+                console.log(id);
+                let url = '../back_end/public/items/'+id;
+
+                let param ={};
+                param.method = 'DELETE';
+                param.header = {'content-Type':'application/json'};
+            
+                fetch(url,param)
+                .then( response => response.json() )
+                .then(
+                info =>{ 
+                    console.log(info);
+                });
+                },valider(i) // EN COURS
+                {
+                
+                let id = this.tableau[i].id;
+                this.tableau.splice(i,1);
+                console.log(id);
+                let url = '../back_end/public/items/'+id;
+
+                let param ={};
+                param.method = 'PUT';
+                param.header = {'content-Type':'application/json'};
+            
+                fetch(url,param)
+                .then( response => response.json() )
+                .then(
+                info =>{ 
+                    console.log(info);
+                });
+                }
+            },
+            mounted(){
+                let url = '../back_end/public/items/';
+                fetch(url)
+                .then( response => response.json() )
+                .then(
+                  tab =>{ 
+                      this.tableau =tab;
+                });
+          
+              }
+        });
+
+
+
+    </script>
+</body>
+</html>
